@@ -1,0 +1,360 @@
+1 - Crie o projeto com o comando:
+
+yarn create react-app exemplo01 --template typescript
+
+2 - Abra o projeto no VS Code;
+
+3 - No terminal do VS Code, instale o pacote o Styled Components como dependência do projeto com o comando:
+
+yarn add styled-components
+
+4 - Também no termina do VS Code, instale o pacote do Cypress como dependência de desenvolvimento com o comando:
+
+yarn add -D cypress
+
+5 - Crie na raíz do projeto o arquivo cypress.config.ts com o conteúdo abaixo:
+
+import { defineConfig } from "cypress";
+
+export default defineConfig({
+  e2e: {
+    baseUrl: "http://127.0.0.1:3000",
+  },
+  video: true,
+  videoCompression: true,
+});
+
+6 - Dentro da pasta src, apague os arquivos App.test.tsx, App.css e logo.svg;
+
+7 - Dentro da pasta src, crie as pastas assets e components. 
+
+8 - Dentro da pasta src/assets, crie a pasta fonts. Dentro da pasta src/assets/fonts, inclua 2 arquivos de fontes (um para fonte do tipo Regular e outro para fonte do tipo Bold);
+
+9 - Ainda dentro da pasta src/assets/fonts, crie o arquivo fonts.ts, com o conteúdo abaixo:
+
+import { createGlobalStyle } from 'styled-components'
+
+import RegularFont from './O_ARQUIVO_DA_SUA_FONTE_REGULAR.ttf'
+import BoldFont from './O_ARQUIVO_DA_SUA_FONTE_BOLD.ttf'
+
+const FontStyles = createGlobalStyle`
+    @font-face {
+        font-family: 'regular';
+        src: url(${RegularFont});
+    }
+
+    @font-face {
+        font-family: 'bold';
+        src: url(${BoldFont});
+    }
+`
+
+export default FontStyles
+
+10 - Para evitar que o VS Code aponte error nas linhas em que são importados os arquivos .ttf, crie dentro da pasta src/assets/fonts o arquivo fonts.d.ts com o conteúdo abaixo:
+
+declare module "*.ttf";
+
+11 - Dentro da pasta src/components, crie a pasta Header. Por sua vez, dentro da pasta src/components/Header, crie os arquivos index.tsx, styles.ts e index.cy.tsx;
+
+12 - Coloque o conteúdo abaixo dentro do arquivo src/components/Header/styles.ts:
+
+import styled from "styled-components";
+
+export const HeaderContainer = styled.div`
+  background-color: black;
+  padding: 30px 20px;
+`;
+
+export const HeaderTitle = styled.h1`
+  font-family: "bold";
+  color: white;
+`;
+
+13 - Coloque o conteúdo abaixo dentro do arquivo src/components/Header/index.tsx:
+
+import { HeaderContainer, HeaderTitle } from './styles'
+
+type Props = {
+  title: string
+}
+
+const Header = ({ title }: Props) => {
+  return (
+    <HeaderContainer>
+      <HeaderTitle data-cy='header-title'>{title}</HeaderTitle>
+    </HeaderContainer>
+  )
+}
+
+export default Header
+
+14 - Coloque o conteúdo abaixo dentro do arquivo src/components/Header/index.cy.tsx (não se preocupe com os erros apontados, por enquanto):
+
+import Header from '.'
+import FontStyles from '../../assets/fonts/fonts'
+
+describe('<Header />', () => {
+  it('should render correct title', () => {
+    const title = 'Exemplo Cypress'
+    cy.mount(
+      <>
+        <FontStyles />
+        <Header title={title} />
+      </>
+    )
+    cy.get('[data-cy=header-title]').should('have.text', title)
+  })
+})
+
+15 - Dentro da pasta src/components, crie a pasta Counter. Por sua vez, dentro da pasta src/components/Counter, crie os arquivos styles.ts, index.tsx e index.cy.tsx;
+
+16 - Coloque o conteúdo abaixo dentro do arquivo src/components/Counter/styles.ts:
+
+import styled from 'styled-components'
+
+export const CounterPanel = styled.div`
+  width: 600px;
+  background-color: #342d71;
+  padding: 30px;
+  text-align: center;
+  margin: 30px auto;
+  border-radius: 15px;
+`
+
+export const CounterTitle = styled.span`
+  font-family: 'bold';
+  font-size: 32px;
+  color: white;
+  margin-right: 10px;
+`
+
+export const CounterValue = styled.span`
+  font-family: 'regular';
+  font-size: 32px;
+  color: white;
+  margin-left: 1px;
+`
+
+17 - Coloque o conteúdo abaixo dentro do arquivo src/components/Counter/index.cy.tsx:
+
+import { CounterPanel, CounterTitle, CounterValue } from './styles'
+
+type Props = {
+  value: number
+}
+
+const Counter = ({ value }: Props) => {
+  return (
+    <CounterPanel>
+      <CounterTitle data-cy='counter-title'>Valor do contador:</CounterTitle>
+      <CounterValue data-cy='counter-value'>{value}</CounterValue>
+    </CounterPanel>
+  )
+}
+
+export default Counter
+
+18 - Coloque o conteúdo abaixo dentro do arquivo src/components/Counter/index.cy.tsx:
+
+import Counter from '.'
+import FontStyles from '../../assets/fonts/fonts'
+
+describe('<Counter />', () => {
+  it('should render correct value', () => {
+    const value = 21
+    cy.mount(
+      <>
+        <FontStyles />
+        <Counter value={value} />
+      </>
+    )
+
+    const counterValue = cy.get('[data-cy="counter-value"]')
+    counterValue.should('have.text', value)
+    counterValue.should('have.css', 'color', 'rgb(255, 255, 255)')
+    counterValue.should('have.css', 'font-family', 'regular')
+    counterValue.should('have.css', 'font-size', '32px')
+  })
+})
+
+19 - No arquivo package.json, altere a seção de scripts, adicionando as linhas de script para abrir o Cypress e para executar o Cypress em segundo plano:
+
+"scripts": {
+	"start": "react-scripts start",
+	"build": "react-scripts build",
+	"test": "react-scripts test",
+	"eject": "react-scripts eject",
+	"cy:open": "cypress open",
+	"cy:run": "cypress run"
+},
+
+20 - No terminal do VS Code, execute o comando abaixo para abrir o Cypress:
+
+yarn cy:open
+
+21 - No Cypress, clique na caixa Component Testing;
+
+22 - Após, verifique se o Cypress detectou o framework utilizado no projeto (no caso, Create React App). Caso sim, clique no botão "Next step" (caso contrário, revise os passos anteriores);
+
+23 - Na próxima janela, o Cypress deverá te informar que você já tem instaladas todas as dependências necessárias para prosseguir (caso contrário, revise os passos anteriores). Clique no botão "Continue";
+
+24 - Na próxima janela, o Cypress informará que ele criou as pastas e arquivos necessários para a sua configuração no projeto. Clique no botão "Continue";
+
+25 - Agora, escolha um browser para executar os testes. Após, clique no botão "Start Component Testing NOME_DO_BROWSER_ESCOLHIDO";
+
+26 - Será aberta uma janela do browser que você escolheu, exibindo os testes de componente encontrados no projeto (no caso, src/components/Counter/index.cy.tsx e src/components/Header/index.cy.tsx). Abra os 2 arquivos e verifique se os testes passam;
+
+27 - Para corrigir o problema dos erros apontados pelo VS Code nos 2 scripts de teste, altere o bloco "include" do arquivo tsconfig.json para o conteúdo abaixo:
+
+"include": ["src", "cypress.d.ts"]
+
+28 - Altere o arquivo src/index.css para o conteúdo abaixo:
+
+body {
+  margin: 0;
+}
+
+29 - Altere o arquivo src/index.tsx para o conteúdo abaixo:
+
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import App from './App';
+import reportWebVitals from './reportWebVitals';
+import FontStyles from './assets/fonts/fonts';
+
+const root = ReactDOM.createRoot(
+  document.getElementById('root') as HTMLElement
+);
+root.render(
+  <>
+    <FontStyles />
+    <App />
+  </>
+);
+
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals();
+
+30 - Crie o arquivo src/styles.ts com o seguinte conteúdo:
+
+import styled from 'styled-components'
+
+export const ButtonPanel = styled.div`
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+`
+
+export const ChangeValueButton = styled.button`
+  margin: 0 10px;
+  width: 200px;
+  background-color: #2d55ff;
+  color: white;
+  font-size: 24px;
+  font-family: 'bold';
+  padding: 20px 10px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+`
+
+31 - Altere o arquivo src/App.tsx para o conteúdo abaixo:
+
+import { useState } from 'react'
+import Header from './components/Header'
+import Counter from './components/Counter'
+import { ButtonPanel, ChangeValueButton } from './styles'
+
+const App = () => {
+  const [value, setValue] = useState(0)
+
+  return (
+    <>
+      <Header title='Exemplo Cypress' />
+
+      <Counter value={value} />
+
+      <ButtonPanel>
+        <ChangeValueButton
+          data-cy='increment-button'
+          onClick={() => setValue(value + 1)}
+        >
+          Incrementar
+        </ChangeValueButton>
+        <ChangeValueButton data-cy='reset-button' onClick={() => setValue(0)}>
+          Zerar
+        </ChangeValueButton>
+      </ButtonPanel>
+    </>
+  )
+}
+
+export default App
+
+32 - Dentro da pasta cypress, crie o arquivo tsconfig.json com o conteúdo abaixo:
+
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": ["es5", "dom"],
+    "types": ["cypress", "node"]
+  },
+  "include": ["**/*.ts"]
+}
+
+33 - Ainda dentro da pasta cypress, crie a pasta e2e. Por sua vez, dentro da pasta cypress/e2e crie o arquivo home.cy.ts com o seguinte conteúdo:
+
+describe('Home Page Spec', () => {
+  beforeEach(() => {
+    cy.visit('')
+  })
+
+  it('should increment counter correctly', () => {
+    const times = 10
+    const incrementButton = cy.get('[data-cy="increment-button"]')
+    for (let i = 0; i < times; i++) {
+      incrementButton.click()
+    }
+
+    cy.get('[data-cy="counter-value"]').should('have.text', times)
+  })
+
+  it('should reset counter correctly', () => {
+    const times = 10
+    const incrementButton = cy.get('[data-cy="increment-button"]')
+    for (let i = 0; i < times; i++) {
+      incrementButton.click()
+    }
+
+    cy.get('[data-cy="reset-button"]').click()
+    cy.get('[data-cy="counter-value"]').should('have.text', 0)
+  })
+})
+
+34 - Dentro da pasta cypress/support, crie o arquivo e2e.ts com o conteúdo abaixo:
+
+import './commands'
+
+35 - No terminal do VS Code, inicie o servidor do app com o comando abaixo:
+
+yarn start
+
+36 - Abra outro terminal dentro do VS Code. Nele, execute o comando para abrir o Cypress:
+
+yarn cy:open
+
+37 - Na janela do Cypress, clique na caixa E2E Testing. Na próxima janela, selecione o browser e clique no botão "Start E2E Testing in BROWSER_QUE_VOCÊ_ESCOLHEU";
+
+38 - Na janela do browser recém aberta, clique no arquivo home.cy.ts. Verifique se os testes passaram. Caso não tenham passado, verifique os passos anteriores.
+
+
+
+
+
+
+
+
+
