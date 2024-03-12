@@ -51,7 +51,7 @@ const FontStyles = createGlobalStyle`
 
 export default FontStyles
 
-10 - Para evitar que o VS Code aponte error nas linhas em que são importados os arquivos .ttf, crie dentro da pasta src/assets/fonts o arquivo fonts.d.ts com o conteúdo abaixo:
+10 - Para evitar que o VS Code aponte error nas linhas em que são importados os arquivos .ttf, crie dentro da pasta src/assets o arquivo fonts.d.ts com o conteúdo abaixo:
 
 declare module "*.ttf";
 
